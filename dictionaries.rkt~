@@ -1,5 +1,13 @@
 #lang dssl2
 
+let eight_principles = ["Know your rights.",
+        "Acknowledge your sources.",
+        "Protect your work.",
+        "Avoid suspicion.",
+        "Do your own work.",
+        "Never falsify a record or permit another person to do so.",
+        "Never fabricate data, citations, or experimental results.",
+        "Always tell the truth when discussing your work with your instructor."]
 
 # HW3: Dictionaries
 
@@ -30,14 +38,6 @@ struct _cons:
     let key
     let value
     let next: OrC(_cons?, NoneC)
-    
-    
-    
-    
-    
-###################
-# Association List
-###################  
 
 
     
@@ -60,6 +60,7 @@ class AssociationList[K, V] (DICT):
             count = count + 1
             current = current.next
         return count        
+        
         
         
         
@@ -97,7 +98,6 @@ class AssociationList[K, V] (DICT):
                 if current.key == key:
                     current.value = value
                     found = True
-                    break
                 current = current.next
             if found == False:
                 let old_head = self._head
@@ -110,32 +110,20 @@ class AssociationList[K, V] (DICT):
 
     def del(self, key: K) -> NoneC:
         if self == None: return error('Association list is empty')
-        
-        if self._head.key == key:
-            self._head = self._head.next
-            return
-        if self._head.next == None:
-            return
-        
         let current = self._head
-        #let found = False
+        let found = False
         while current is not None:
             # length one, key found case: 
-            #if current.next == None and current.key == key:
-                #self._head = None
-                #found = True
-               # break
+            if current.next == None and current.key == key:
+                self._head = None
+                found = True
             # length 2+
-            if current.next == None:
-                return 
-            if current.next.key == key:
-                #found = True
+            elif current.next.key == key:
+                found = True
                 current.next = current.next.next
-                return
             current = current.next
-        #if found == False:
-            #return error('Key not found')
-        return None
+        if found == False:
+            return error('Key not found')
         
         
 
@@ -164,7 +152,7 @@ test 'AssociationList# len test':
     assert_error a.len(1)
     assert_error a.len(a)
                 
-test 'AssociationList# mem? test':
+test 'AssociationList# mem test':
     let a = AssociationList()
     a.put(1,'a')
     assert a.mem?(1)
@@ -250,41 +238,17 @@ test 'AssociationList# None as key/value':
     assert a.get(None) == 'none_value'
     a.put('key_with_none', None)
     assert a.get('key_with_none') == None    
-   
+    
+    
+    
+test 'yOu nEeD MorE tEsTs':
+    let a = AssociationList()
+    assert not a.mem?('hello')
+    a.put('hello', 5)
+    assert a.len() == 1
+    assert a.mem?('hello')
+    assert a.get('hello') == 5
 
-    
-    
-test 'deletion of absent key1':
-    let o = AssociationList()
-    o.put(5, 'five')
-    o.put(15, 'fifteen')
-    o.put(25, 'twenty-five')
-    o.del(25)
-    assert o.mem?(5) is True
-    assert o.mem?(15) is True
-    assert o.mem?(25) is False    
-    
-test 'deletion of absent key1':
-    let o = AssociationList()
-    o.put(5, 'five')
-    o.del(6)
-    assert o.get(5) == 'five'    
-    
-    
-test 'deletion of absent key3':
-    let o = AssociationList()
-    o.put(5, 'five')
-    o.del(6)
-    assert o.len() == 1    
-    
-    
-    
-    
-################
-# Hash Table
-################    
-    
-    
 
 class HashTable[K, V] (DICT):
     let _hash
@@ -298,51 +262,38 @@ class HashTable[K, V] (DICT):
         
         
     def len(self) -> nat?:
-        let count = 0
-        for i in range (self._data.len()):
-            # each bucket is an assoc list - call .len on each.
-            if self._data[i] != None:
-                count = count + self._data[i].len()
-        return count
+        pass
 
         
     def mem?(self, key: K) -> bool?:
-        let index = self._hash(key) % self._data.len()
-        if self._data[index] is None:
-            return False
-            # use .mem? method from assoc list
-        return self._data[index].mem?(key)
+        pass
         
     
     def get(self, key: K) -> V:
-        let index = self._hash(key) % self._data.len()
-        if self._data[index] is None:
-            return error('Key not found')
-        else: return self._data[index].get(key)
-
+        pass
         
     def put(self, key: K, value: V) -> NoneC:
-        let index = self._hash(key) % self._data.len()
-        if self._data[index] is None:
-            self._data[index] = AssociationList()
-        self._data[index].put(key, value)
         
-
+        pass
         
     def del(self, key: K) -> NoneC:
-        let index = self._hash(key) % self._data.len()
-        if self._data[index] is None:
-            return
-        self._data[index].del(key)
+        pass     
         
-  
         
+        
+        
+        
+        
+        
+    #   ^ ADD YOUR WORK HERE
 
+    # This avoids trying to print the hash function, since it's not really
+    # printable and isn’t useful to see anyway:
     def __print__(self, print):
         print("#<object:HashTable  _hash=... _size=%p _data=%p>",
               self._size, self._data)
 
-
+    # Other methods you may need can go here.
 
 
 # first_char_hasher(String) -> Natural
@@ -354,188 +305,22 @@ def first_char_hasher(s: str?) -> int?:
         return 0
     else:
         return int(s[0])
-        
-        
-test 'HashTable# init test':
-    let h
-    assert_error h == HashTable(4)
-    assert_error h == HashTable()
 
-test 'HashTable# len test':
-    let h = HashTable(4, first_char_hasher)
-    assert h.len() == 0   
-    h.put('Doechii', 'GOAT')     
+test 'yOu nEeD MorE tEsTs, part 2':
+    let h = HashTable(10, make_sbox_hash())
+    assert not h.mem?('hello')
+    h.put('hello', 5)
     assert h.len() == 1
-    h.put('Banana', 2)
-    assert h.len() == 2
-    assert_error h.len(1)        
-        
-test 'HashTable# mem? test':
-    let h = HashTable(4, first_char_hasher)
-    assert not h.mem?('A') 
-    h.put('Beyonce', 35)
-    assert h.mem?('Beyonce')
-    assert not h.mem?('Chappell Roan')
-    h.put('Chappell Roan', 1)
-    assert h.mem?('Beyonce')
-    assert h.mem?('Chappell Roan')
-    h.del('Beyonce')
-    assert not h.mem?('Beyonce')
-    assert h.mem?('Chappell Roan')        
-        
-test 'HashTable# put + get test':      
-    let h = HashTable(4, first_char_hasher)
-    assert h.len() == 0
-    h.put('Cats', 2)
-    assert h.get('Cats') == 2
-    assert_error h.get('Dogs')
-    assert h.len() == 1
-    h.put('Dogs', 1)
-    assert h.len() == 2
-    assert h.get('Dogs') == 1
-    assert h.get('Cats') == 2
-    assert_error h.get('Lizard')    
-        
-test 'HashTable# simple put w collision':
-    let h = HashTable(4, first_char_hasher)
-    h.put('Georgia', 'Peach')
-    #h.__print__(println)
-    assert h.len() == 1
-    h.put('Connecticut', 'Nutmeg')
-    h.put('California', 'Avocado')
-    assert h.len() == 3
-    assert h.get('Connecticut') == 'Nutmeg'
-    assert h.get('California') == 'Avocado'
-    
-test 'HashTable# put errors':
-    let h = HashTable(4, first_char_hasher)
-    assert_error h.put() 
-    assert_error h.put(1)
-    assert_error h.put(h)
-    assert_error h.put('hi')
-    assert_error h.put('hi', 3, None)
-    
-
-    
-test 'HashTable# delete':
-    let h = HashTable(4, first_char_hasher)
-    h.put('Charli xcx', 'how im feeling now')
-    h.put('FKA Twigs', 'magdalene')
-    h.put('Isaiah Rashad', 'The Suns Tirade')
-    #h.__print__(println)
-    h.del('Charli xcx')
-    assert_error h.get('Charli xcx')  
-    h.del('FKA Twigs')
-    assert_error h.get('FKA Twigs')  
-    h.del('Isaiah Rashad')
-    assert_error h.get('Isaiah Rashad')    
-    
- 
-    
-    
-test 'HashTable# put updates existing key':
-    let h = HashTable(4, first_char_hasher)
-    h.put('Paris', 'Girlfriend')
-    assert h.get('Paris') == 'Girlfriend'
-    h.put('Paris', 'wife')
-    assert h.get('Paris') == 'wife'
-    assert h.len() == 1     
-    
-    
-test 'HashTable# deleting from empty table':
-    let h = HashTable(4, first_char_hasher)
-    h.del('A')    
-       
-
-
-test 'HashTable# different data types':
-    let h = HashTable(4, make_sbox_hash())
-    h.put('string', 10)
-    h.put(42, 'forty-two')
-    assert h.get('string') == 10
-    assert h.get(42) == 'forty-two'    
-    
-test 'HashTable# None as key/value':
-    let h = HashTable(4, make_sbox_hash())
-    h.put(None, 'none_value')
-    assert h.get(None) == 'none_value'
-    h.put('key_with_none', None)
-    assert h.get('key_with_none') == None
-    
-    
-    
-test 'HashTable# collisions using first_char_hasher':
-    let h = HashTable(4, first_char_hasher)
-    h.put('Apple', 'red')
-    h.put('Avocado', 'green')  # collision
-    assert h.get('Apple') == 'red'
-    assert h.get('Avocado') == 'green'
-    h.put('Banana', 'yellow')
-    h.put('Blueberry', 'small')  # collision
-    assert h.get('Banana') == 'yellow'
-    assert h.get('Blueberry') == 'small'
-    h.put('Cherry', 'red')
-    assert h.get('Cherry') == 'red'
-    h.del('Apple')
-    assert_error h.get('Apple')
-    assert h.get('Avocado') == 'green'
-    
-    
-test 'deletion of absent key':
-    let o = HashTable(10, int)
-    o.put(5, 'five')
-    o.put(15, 'fifteen')
-    o.put(25, 'twenty-five')
-    o.del(25)
-    assert o.mem?(5) is True
-    assert o.mem?(15) is True
-    assert o.mem?(25) is False
-    let a = HashTable(10, int)
-    a.put(5, 'five')
-    a.del(6)
-    assert a.get(5) == 'five'
-    let e = HashTable(10, int)
-    e.put(5, 'five')
-    e.del(6)
-    assert e.len() == 1
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+    assert h.mem?('hello')
+    assert h.get('hello') == 5
 
 
 def compose_phrasebook(d: DICT!) -> DICT?:
-    d.put('Bom dia', ['Good morning', 'bom dee-ya'])
-    d.put('Tudo bem?', ['All good?', 'tu-du baim?'])
-    d.put('Agua', ['Water', 'ah-gwah'])
-    d.put('Sapato', ['Shoe', 'sah-pah-tu'])
-    d.put('Pao de Queijo', ['Cheese bread', 'pown-deh-kay-zho'])
-    return d
-    
+    pass
+#   ^ ADD YOUR WORK HERE
 
 test "AssociationList phrasebook":
-    let a = AssociationList()
-    compose_phrasebook(a)
-    assert a.get('Pao de Queijo')[1] == 'pown-deh-kay-zho'
-
+    pass
 
 test "HashTable phrasebook":
-    let h = HashTable(10, make_sbox_hash())
-    compose_phrasebook(h)
-    assert h.get('Agua')[1] == 'ah-gwah'
-
-    
+    pass
